@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+	background: linear-gradient(#f7aeb7, #ffcccc, #ffeee6);
+}
+
+@font-face {
+    font-family: 'Molisa Delawere';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Molisa Delawere'), url('https://fonts.cdnfonts.com/s/94129/Molisadelawere-owWPd.woff') format('woff');
+}
+
+.gamefont{
+	font-family: 'Molisa Delawere', sans-serif;
+}
+
+@layer base{
+	.transformbtn{
+		transform: scale(.95);
+	}
+	
+	.height-fixed{
+		height: calc(100% / 8)
+	}
+}
