@@ -10,6 +10,8 @@ const server = createServer(app)
 
 app.use(express.static('views'))
 
+console.log(process.env.CLIENT_URL)
+
 const io = new Server(server,{
 	cors: {
 		origin: process.env.CLIENT_URL,
