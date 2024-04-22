@@ -12,8 +12,8 @@ export function useCountDown(initialTime: number){
 		endTime.current = currentTime.current + leftTime.current;
 		intervalFunc.current = setInterval(() => {
 			currentTime.current = new Date().getTime();
-			leftTime.current = endTime.current - currentTime.current;
-			setTime(() => leftTime.current)
+			leftTime.current = endTime.current - currentTime.current, 0;
+			setTime(() => leftTime.current < 0 ? 0 : leftTime.current)
 		}, 10);
 	}
 

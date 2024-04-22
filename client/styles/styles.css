@@ -41,9 +41,9 @@ body{
 		height: calc(100% / 9) /* height of a tr in 8x8 table*/
 	}
 	
-	.loading-game::after{
+	.loading::after{
 		content: "";
-		animation: loading 1.5s infinite linear;
+		animation: loading 1s infinite linear;
 	}
 
 }

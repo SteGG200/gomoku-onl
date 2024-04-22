@@ -12,7 +12,7 @@ import LoadingOnlineGame from "./Loading";
 export default function Game(props : {matchId : string}){
 	const socket = React.useMemo(() => io(process.env.NEXT_PUBLIC_REST_API_URL!),[])
 	const turn = React.useRef("X");
-	const [yourMark, setYourMark] = React.useState("");
+	const yourMark = React.useRef("");
 	const [board, setBoard, getWinner] = useBoard();
 	const router = useRouter();
 	const timelimit = 1000 * 60 * 5;
@@ -26,12 +26,13 @@ export default function Game(props : {matchId : string}){
 	winner.current = getWinner();
 	
 	React.useEffect(() => {
-		setYourMark(sessionStorage.getItem('mark')!)
+		yourMark.current = sessionStorage.getItem('mark')!
 
-		socket.emit('start_match', {
+		socket.emit('ready_for_match', {
 			matchId: props.matchId,
 			key: sessionStorage.getItem('key')
 		})
+		console.log("ready")
 		
 		socket.on('warning', (res : {status: number, message?: string}) => {
 			if(res.status === 401){
@@ -42,6 +43,18 @@ export default function Game(props : {matchId : string}){
 					setOpponentConnection(false);
 					yourTime.stop();
 					opponentTime.stop();
+				}
+			}
+		})
+
+		socket.on('start_match', (res: {status: number}) => {
+			console.log("Start Match")
+			setLoadingGame(false);
+			if(yourMark.current){
+				if(yourMark.current !== turn.current){
+					opponentTime.start();
+				}else{
+					yourTime.start();
 				}
 			}
 		})
@@ -72,26 +85,13 @@ export default function Game(props : {matchId : string}){
 			ResetStorage();
 			console.log("Disconnected")
 		})
-
-		setLoadingGame(false);
 	},[])
-
-	React.useEffect(() => {
-		// console.log("Here");
-		if(yourMark){
-			if(yourMark !== turn.current){
-				opponentTime.start();
-			}else{
-				yourTime.start();
-			}
-		}
-	},[yourMark])
 
 	const onClick = (i: number, j : number) => {
 		socket.emit('movement',{
 			i,
 			j,
-			mark : yourMark,
+			mark : yourMark.current,
 			matchId: props.matchId
 		})
 	}
@@ -106,12 +106,12 @@ export default function Game(props : {matchId : string}){
 
 	if(opponentTime.time <= 0){
 		opponentTime.stop();
-		winner.current = yourMark;
+		winner.current = yourMark.current;
 	}
 
 	if(yourTime.time <= 0){
 		yourTime.stop();
-		if(yourMark === "X"){
+		if(yourMark.current === "X"){
 			winner.current = "O"
 		}else{
 			winner.current = "X"
@@ -119,7 +119,7 @@ export default function Game(props : {matchId : string}){
 	}
 
 	React.useEffect(() => {
-		if((winner.current && winner.current === yourMark) || !opponentConnection){
+		if((winner.current && winner.current === yourMark.current) || !opponentConnection){
 			const WinnerSound = new Audio('./sounds/WinnerSound.wav');
 			WinnerSound.play();
 			ResetStorage();
@@ -141,7 +141,7 @@ export default function Game(props : {matchId : string}){
 								<p
 									className="text-center gamefont text-3xl sm:text-4xl"
 								>
-									{winner.current === yourMark ? "You win!" : "You lose"}
+									{winner.current === yourMark.current ? "You win!" : "You lose"}
 								</p>
 								:
 								<p
@@ -161,7 +161,7 @@ export default function Game(props : {matchId : string}){
 					<UserDetails>
 						<p>Your opponent's time:</p>
 						<TimeShow
-							running = {yourMark !== turn.current}
+							running = {yourMark.current !== turn.current}
 						>
 							{Math.floor(Math.floor(opponentTime.time / 1000) / 60)} : {zeroPad(Math.floor(opponentTime.time / 1000) % 60, 2)}
 						</TimeShow>
@@ -169,12 +169,12 @@ export default function Game(props : {matchId : string}){
 					<Board
 						table={board}
 						onClick={onClick}
-						disabled={turn.current !== yourMark || winner.current !== undefined}
+						disabled={turn.current !== yourMark.current || winner.current !== undefined}
 					/>
 					<UserDetails>
-						<p>You are <b>{yourMark}</b>! Your time:</p>
+						<p>You are <b>{yourMark.current}</b>! Your time:</p>
 						<TimeShow
-							running = {yourMark === turn.current}
+							running = {yourMark.current === turn.current}
 						>
 							{Math.floor(Math.floor(yourTime.time / 1000) / 60)} : {zeroPad(Math.floor(yourTime.time / 1000) % 60, 2)}
 						</TimeShow>

@@ -8,6 +8,7 @@ const events = {
 		send_info_match : 'info-match'
 	},
 	match_handle: {
+		ready_for_match: 'ready_for_match',
 		start_match : 'start_match',
 		movement: 'movement',
 		op_move: 'op_move'
@@ -17,6 +18,7 @@ const events = {
 };
 
 let queue: string[] = [];
+let number_of_ready_players_each_matchs : {[key: string]: number} = {};
 
 function remove_from_queue(socket_id : string){
 	const index = queue.indexOf(socket_id);
@@ -29,6 +31,7 @@ function remove_from_queue(socket_id : string){
 
 export function socket_run(io : Server){
 	io.on(events.connection, (socket : Socket) => {
+		// Get the connection from client and create the match
 		socket.on(events.match_making.get_match_requests, () => {
 			console.log(`Connected to user ${socket.id}`);
 			socket.join(`server-to-${socket.id}`);
@@ -47,6 +50,7 @@ export function socket_run(io : Server){
 				remove_from_queue(socket_id_opponent);
 				remove_from_queue(socket.id);
 				// console.log(match)
+				number_of_ready_players_each_matchs[match.matchId] = 0;
 				io.to(`server-to-${socket_id_opponent}`).emit(events.match_making.send_info_match,{
 					matchId: match.matchId,
 					mark: match.marks.first,
@@ -60,7 +64,8 @@ export function socket_run(io : Server){
 			}
 		})
 		
-		socket.on(events.match_handle.start_match, (match : {matchId: string, key: string}) => {
+		// Handle client's connection to the match
+		socket.on(events.match_handle.ready_for_match, (match : {matchId: string, key: string}) => {
 			if(!is_in_this_match(match.matchId, match.key)){
 				console.log(`Client ${socket.id} isn't allowed to join this match`)
 				socket.emit(events.warning, {status : 401})
@@ -68,6 +73,14 @@ export function socket_run(io : Server){
 			}else{
 				console.log(`Client ${socket.id} asked to start the match!`)
 				socket.join(match.matchId)
+				number_of_ready_players_each_matchs[match.matchId] += 1;
+				// console.log(number_of_ready_players_each_matchs)
+				if(number_of_ready_players_each_matchs[match.matchId] == 2){
+					delete number_of_ready_players_each_matchs[match.matchId];
+					io.to(match.matchId).emit(events.match_handle.start_match, {
+						status: 200
+					})
+				}
 				socket.on(events.disconnect, (reason : string) => {
 					console.log(`Client ${socket.id} has been disconnected from match ${match.matchId}: ${reason}`)
 					socket.to(match.matchId).emit(events.warning, {
@@ -78,6 +91,7 @@ export function socket_run(io : Server){
 			}
 		})
 
+		// Handle client's movement
 		socket.on(events.match_handle.movement, (movement: {i : number, j : number, mark : string, matchId: string}) => {
 			io.to(movement.matchId).emit(events.match_handle.op_move, {
 				i: movement.i,

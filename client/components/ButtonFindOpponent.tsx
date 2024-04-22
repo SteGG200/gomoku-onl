@@ -34,9 +34,9 @@ export default function ButtonFindOpponent({ disabled, callback }: { disabled: b
 			>
 				{
 					!isFinding ?
-						<>Find opponent</>
+						<p>Find opponent</p>
 						:
-						<>Waiting for opponent...</>
+						<p className="loading">Waiting for opponent</p>
 				}
 			</button>
 		</div>
