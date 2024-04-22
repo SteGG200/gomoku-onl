@@ -17,6 +17,21 @@ body{
 	font-family: 'Molisa Delawere', sans-serif;
 }
 
+@keyframes loading{
+	0% {
+		content: "";
+	}
+	33% {
+		content: " .";
+	}
+	66% {
+		content: " . .";
+	}
+	100% {
+		content: " . . .";
+	}
+}
+
 @layer base{
 	.transformbtn{
 		transform: scale(.95);
@@ -25,4 +40,10 @@ body{
 	.height-fixed{
 		height: calc(100% / 9) /* height of a tr in 8x8 table*/
 	}
+	
+	.loading-game::after{
+		content: "";
+		animation: loading 1.5s infinite linear;
+	}
+
 }

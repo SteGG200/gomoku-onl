@@ -7,6 +7,7 @@ import { io } from "socket.io-client"
 import Board from "./Board";
 import { useCountDown } from "@/hooks/useCountDown";
 import WinnerBox from "./WinnerBox";
+import LoadingOnlineGame from "./Loading";
 
 export default function Game(props : {matchId : string}){
 	const socket = React.useMemo(() => io(process.env.NEXT_PUBLIC_REST_API_URL!),[])
@@ -18,6 +19,7 @@ export default function Game(props : {matchId : string}){
 	const opponentTime = useCountDown(timelimit);
 	const yourTime = useCountDown(timelimit);
 	const [opponentConnection, setOpponentConnection] = React.useState(true);
+	const [LoadingGame, setLoadingGame] = React.useState(true);
 	
 	const winner : React.MutableRefObject<string> | React.MutableRefObject<undefined> = React.useRef();
 
@@ -70,6 +72,8 @@ export default function Game(props : {matchId : string}){
 			ResetStorage();
 			console.log("Disconnected")
 		})
+
+		setLoadingGame(false);
 	},[])
 
 	React.useEffect(() => {
@@ -125,51 +129,58 @@ export default function Game(props : {matchId : string}){
 	return(
 		<main className="h-screen flex flex-col justify-center space-y-3">
 			{
-				(winner.current || !opponentConnection) &&
-				<WinnerBox>
+				LoadingGame ?
+				<LoadingOnlineGame/>
+				:
+				<>
 					{
-						winner.current ? 
-						<p
-							className="text-center gamefont text-3xl sm:text-4xl"
-						>
-							{winner.current === yourMark ? "You win!" : "You lose"}
-						</p>
-						:
-						<p
-							className="text-center gamefont text-2xl sm:text-3xl"
-						>
-							Your opponent is disconnected!
-						</p>
+						(winner.current || !opponentConnection) &&
+						<WinnerBox>
+							{
+								winner.current ? 
+								<p
+									className="text-center gamefont text-3xl sm:text-4xl"
+								>
+									{winner.current === yourMark ? "You win!" : "You lose"}
+								</p>
+								:
+								<p
+									className="text-center gamefont text-2xl sm:text-3xl"
+								>
+									Your opponent is disconnected!
+								</p>
+							}
+							<button
+									className="outline-0 gamefont bg-green-500 hover:bg-green-400 w-2/3 mx-auto p-2 rounded text-center"
+									onClick={playAgainOnClick}
+								>
+									Play again
+							</button>
+						</WinnerBox>
 					}
-					<button
-							className="outline-0 gamefont bg-green-500 hover:bg-green-400 w-2/3 mx-auto p-2 rounded text-center"
-							onClick={playAgainOnClick}
+					<UserDetails>
+						<p>Your opponent's time:</p>
+						<TimeShow
+							running = {yourMark !== turn.current}
 						>
-							Play again
-					</button>
-				</WinnerBox>
+							{Math.floor(Math.floor(opponentTime.time / 1000) / 60)} : {zeroPad(Math.floor(opponentTime.time / 1000) % 60, 2)}
+						</TimeShow>
+					</UserDetails>
+					<Board
+						table={board}
+						onClick={onClick}
+						disabled={turn.current !== yourMark || winner.current !== undefined}
+					/>
+					<UserDetails>
+						<p>You are <b>{yourMark}</b>! Your time:</p>
+						<TimeShow
+							running = {yourMark === turn.current}
+						>
+							{Math.floor(Math.floor(yourTime.time / 1000) / 60)} : {zeroPad(Math.floor(yourTime.time / 1000) % 60, 2)}
+						</TimeShow>
+					</UserDetails>
+				</>
 			}
-			<UserDetails>
-				<p>Your opponent's time:</p>
-				<TimeShow
-					running = {yourMark !== turn.current}
-				>
-					{Math.floor(Math.floor(opponentTime.time / 1000) / 60)} : {zeroPad(Math.floor(opponentTime.time / 1000) % 60, 2)}
-				</TimeShow>
-			</UserDetails>
-			<Board
-				table={board}
-				onClick={onClick}
-				disabled={turn.current !== yourMark || winner.current !== undefined}
-			/>
-			<UserDetails>
-				<p>You are <b>{yourMark}</b>! Your time:</p>
-				<TimeShow
-					running = {yourMark === turn.current}
-				>
-					{Math.floor(Math.floor(yourTime.time / 1000) / 60)} : {zeroPad(Math.floor(yourTime.time / 1000) % 60, 2)}
-				</TimeShow>
-			</UserDetails>
 		</main>
 	)
 }
