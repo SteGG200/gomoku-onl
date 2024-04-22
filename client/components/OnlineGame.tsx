@@ -7,7 +7,6 @@ import { io } from "socket.io-client"
 import Board from "./Board";
 import { useCountDown } from "@/hooks/useCountDown";
 import WinnerBox from "./WinnerBox";
-import Link from "next/link";
 
 export default function Game(props : {matchId : string}){
 	const socket = React.useMemo(() => io(process.env.NEXT_PUBLIC_REST_API_URL!),[])
@@ -68,6 +67,7 @@ export default function Game(props : {matchId : string}){
 		})
 
 		socket.on('disconnect', () =>{
+			ResetStorage();
 			console.log("Disconnected")
 		})
 	},[])
@@ -95,6 +95,7 @@ export default function Game(props : {matchId : string}){
 	const zeroPad = (num : number, places : number) => String(num).padStart(places, '0');
 
 	const playAgainOnClick = () => {
+		// ResetStorage();
 		socket.disconnect();
 		router.push('/');
 	}
@@ -117,6 +118,7 @@ export default function Game(props : {matchId : string}){
 		if((winner.current && winner.current === yourMark) || !opponentConnection){
 			const WinnerSound = new Audio('./sounds/WinnerSound.wav');
 			WinnerSound.play();
+			ResetStorage();
 		}
 	},[winner.current, opponentConnection])
 
@@ -189,4 +191,10 @@ function TimeShow(props : {
 			{props.children}
 		</div>
 	)
+}
+
+function ResetStorage(){
+	sessionStorage.removeItem('mark');
+  sessionStorage.removeItem('key');
+  sessionStorage.removeItem('username');
 }
