@@ -23,6 +23,6 @@ body{
 	}
 	
 	.height-fixed{
-		height: calc(100% / 8)
+		height: calc(100% / 9) /* height of a tr in 8x8 table*/
 	}
 }

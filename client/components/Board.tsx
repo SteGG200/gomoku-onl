@@ -25,17 +25,17 @@ export default function Board(
 ){
 
 	return(
-		<div className="w-11/12 sm:w-[600px] mx-auto aspect-square">
-			<table className="w-full h-full table-fixed">
-				{
-					props.caption && 
-					<caption className="gamefont mb-2">{props.caption}</caption>
-				}
+		<div className="space-y-4">
+			{
+				props.caption && 
+				<p className="gamefont sm:text-2xl text-center">{props.caption}</p>
+			}
+			<table className="table-fixed w-11/12 sm:w-[650px] min-[2000px]:w-[800px] mx-auto aspect-square">
 				<tbody>
 					{
 						props.table.map((row, i) => {
 							return (
-								<tr key={i} className="max-sm:height-fixed sm:h-[74px]">
+								<tr key={i} className="box-border height-fixed">
 									{
 										row.map((value, j) => {
 											return <td key={j} className="border-4 sm:border-8 border-[#333] sm:hover:bg-[#00000030]" 
