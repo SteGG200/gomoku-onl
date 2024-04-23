@@ -23,7 +23,7 @@ export default function HelpBox({callback, setShowHelpBox}: {callback: any, setS
 						You and your rival alternately place X or O on an empty square. The winner is the first player to form an unbroken line of 5 words which they own horizontally, vertically, or diagonally. If the board is completely filled and no one can make a line of 5 words, then the game ends in a draw.
 					</li>
 					<li>
-						In an online game, player who has X plays first. Each player has totally 5 minutes to all movement.
+						In an online game, player who has X plays first. Each player has totally 5 minutes for all movement.
 					</li>
 				</ul>
 			</div>
