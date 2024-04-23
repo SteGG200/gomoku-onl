@@ -83,7 +83,7 @@ export default function OfflineGame(){
 			<Board
 				table={board}
 				onClick={onClick}
-				caption={`Current turn: ${turn}`}
+				caption={`Current turn : ${turn}`}
 				disabled={winner !== undefined}
 			/>
 		</main>
