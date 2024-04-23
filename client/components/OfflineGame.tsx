@@ -62,7 +62,7 @@ export default function OfflineGame(){
 					<p
 						className="text-center gamefont text-3xl sm:text-4xl"
 					>
-						Winner is {winner}
+						{winner === "D" ? "Game is draw" : `Winner is ${winner}`}
 					</p>
 					<div className="flex flex-col gap-4">
 						<button

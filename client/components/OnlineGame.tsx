@@ -26,8 +26,6 @@ export default function Game(props : {matchId : string}){
 	winner.current = getWinner();
 	
 	React.useEffect(() => {
-		window.addEventListener("beforeunload", beforeunloadHandler);
-
 		yourMark.current = sessionStorage.getItem('mark')!
 
 		socket.emit('ready_for_match', {
@@ -50,8 +48,8 @@ export default function Game(props : {matchId : string}){
 		})
 
 		socket.on('start_match', (res: {status: number}) => {
-			console.log("Start Match")
 			setLoadingGame(false);
+			window.addEventListener("beforeunload", beforeunloadHandler); // Add beforeunload event
 			if(yourMark.current){
 				if(yourMark.current !== turn.current){
 					opponentTime.start();
@@ -149,7 +147,7 @@ export default function Game(props : {matchId : string}){
 								<p
 									className="text-center gamefont text-3xl sm:text-4xl"
 								>
-									{winner.current === yourMark.current ? "You win!" : "You lose"}
+									{winner.current === "D" ? "Game is Draw" : `${winner.current === yourMark.current ? "You win!" : "You lose"}`}
 								</p>
 								:
 								<p
