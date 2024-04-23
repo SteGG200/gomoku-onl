@@ -26,6 +26,8 @@ export default function Game(props : {matchId : string}){
 	winner.current = getWinner();
 	
 	React.useEffect(() => {
+		window.addEventListener("beforeunload", beforeunloadHandler);
+
 		yourMark.current = sessionStorage.getItem('mark')!
 
 		socket.emit('ready_for_match', {
@@ -87,7 +89,7 @@ export default function Game(props : {matchId : string}){
 		})
 	},[])
 
-	const onClick = (i: number, j : number) => {
+	const moveHandler = (i: number, j : number) => {
 		socket.emit('movement',{
 			i,
 			j,
@@ -97,12 +99,6 @@ export default function Game(props : {matchId : string}){
 	}
 
 	const zeroPad = (num : number, places : number) => String(num).padStart(places, '0');
-
-	const playAgainOnClick = () => {
-		// ResetStorage();
-		socket.disconnect();
-		router.push('/');
-	}
 
 	if(opponentTime.time <= 0){
 		opponentTime.stop();
@@ -118,13 +114,25 @@ export default function Game(props : {matchId : string}){
 		}
 	}
 
+	// Handle when game is over
 	React.useEffect(() => {
-		if((winner.current && winner.current === yourMark.current) || !opponentConnection){
-			const WinnerSound = new Audio('./sounds/WinnerSound.wav');
-			WinnerSound.play();
+		if(winner.current || !opponentConnection){
+			yourTime.stop();
+			opponentTime.stop();
 			ResetStorage();
+			window.removeEventListener("beforeunload", beforeunloadHandler);
+			if(winner.current && winner.current === yourMark.current){
+				const WinnerSound = new Audio('./sounds/WinnerSound.wav');
+				WinnerSound.play();
+			}
 		}
-	},[winner.current, opponentConnection])
+	},[winner.current, opponentConnection]) 
+
+	const playAgainOnClick = () => {
+		// ResetStorage();
+		socket.disconnect();
+		router.push('/');
+	}
 
 	return(
 		<main className="h-screen flex flex-col justify-center space-y-3">
@@ -168,7 +176,7 @@ export default function Game(props : {matchId : string}){
 					</UserDetails>
 					<Board
 						table={board}
-						onClick={onClick}
+						onClick={moveHandler}
 						disabled={turn.current !== yourMark.current || winner.current !== undefined}
 					/>
 					<UserDetails>
@@ -208,4 +216,8 @@ function ResetStorage(){
 	sessionStorage.removeItem('mark');
   sessionStorage.removeItem('key');
   sessionStorage.removeItem('username');
+}
+
+function beforeunloadHandler(event: BeforeUnloadEvent){
+	event.preventDefault();
 }
