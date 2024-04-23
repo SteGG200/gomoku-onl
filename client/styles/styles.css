@@ -10,7 +10,7 @@ body{
     font-family: 'Molisa Delawere';
     font-style: normal;
     font-weight: 400;
-    src: local('Molisa Delawere'), url('https://fonts.cdnfonts.com/s/94129/Molisadelawere-owWPd.woff') format('woff');
+    src: local('Molisa Delawere'), url(/fonts/Molisadelawere-owWPd.woff) format('woff');
 }
 
 .gamefont{
