@@ -2,18 +2,22 @@
 	"ts-node": {
 		"files": true
 	},
-	"files": [
-		"types/**/*.ts",
-		"src/**/*.ts"
-	],
 	"compilerOptions": {
-		"target": "ES5",
-		"module": "CommonJS",
+		"target": "ES2022",
+		"module": "ES2022",
 		"moduleResolution": "node",
 		"esModuleInterop": true,
+		"allowJs": true,
+		"checkJs": true,
+		"strict": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
 		"outDir": "dist",
-		"strict": true
+		"sourceMap": true,
+		"declaration": true,
+		"declarationDir": "dist/types",
+		"declarationMap": true
 	},
 
-	"include": ["**/*.ts"]
+	"include": ["src/**/*.ts", "types/**/*.ts"]
 }

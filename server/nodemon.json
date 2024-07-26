@@ -7,7 +7,7 @@
 	],
 	"watch" : ["src/"],
 	"execMap" : {
-		"ts" : "node -r ts-node/register"
+		"ts" : "node --env-file=./.env -r ts-node/register"
 	},
 	"ext" : "js,json,ts"
 }

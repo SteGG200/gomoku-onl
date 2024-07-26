@@ -1,6 +1,5 @@
 import { v4 as uuidv4} from 'uuid'
 import CryptoJS from 'crypto-js'
-require('dotenv').config();
 
 export function find_opponent(queue : string[], socket_id : string) : string | undefined{
 	const len = queue.length;
